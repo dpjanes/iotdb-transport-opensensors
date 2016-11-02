@@ -25,6 +25,9 @@
 const iotdb = require('iotdb');
 const _ = iotdb._;
 
+const assert = require("assert");
+
+const iotdb_format = require("iotdb-format");
 const iotdb_transport = require('iotdb-transport');
 const errors = require('iotdb-errors');
 
@@ -37,6 +40,9 @@ const make = (initd, mqtt_client) => {
     const self = iotdb_transport.make();
     self.name = "iotdb-transport-opensensors";
 
+    const _mqtt_client = mqtt_client;
+    assert.ok(_mqtt_client);
+
     const _initd = _.d.compose.shallow(
         initd, {
             channel: iotdb_transport.channel,
@@ -47,9 +53,18 @@ const make = (initd, mqtt_client) => {
             pack: d => JSON.stringify(d.value),
         },
         iotdb.keystore().get("/transports/iotdb-transport-opensensors/initd"), {
-            prefix: "/users/dpjanes/",
+            prefix: "/users/{{ username }}/",
+            username: null,
+            password: null,
+            client_id: null,
         }
     );
+
+    assert.ok(_initd.username, "initd.username is required");
+    assert.ok(_initd.password, "initd.password is required");
+    assert.ok(_initd.client_id, "initd.client_id is required");
+
+    _initd.prefix = iotdb_format.format(_initd.prefix, _initd);
 
     self.rx.put = (observer, d) => {
         _mqtt_client.ensure(error => {
@@ -58,10 +73,11 @@ const make = (initd, mqtt_client) => {
             }
 
             const topic = _initd.channel(_initd, d);
-            const message = _initd.pack(_initd, d);
+            const message = _initd.pack(d);
 
             if (_initd.verbose) {
                 logger.info({
+                    d: d,
                     topic: topic,
                     message: message,
                     message_type: typeof message,

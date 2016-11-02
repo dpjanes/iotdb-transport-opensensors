@@ -9,9 +9,9 @@
 const iotdb = require("iotdb");
 const _ = iotdb._;
 
-const transport = require("..")
+const index = require("..")
 
-const mqtt_client = transport.connect(require("./opensensors.json"), error => {
+const mqtt_client = index.connect(require("./opensensors.json"), error => {
     if (error) {
         console.log("#", "error connecting", _.error.message(error));
         process.exit(1);
