@@ -33,39 +33,61 @@ const logger = iotdb.logger({
     module: 'transporter',
 });
 
-const make = (initd) => {
+const make = (initd, mqtt_client) => {
     const self = iotdb_transport.make();
     self.name = "iotdb-transport-opensensors";
 
-    const _initd = _.d.compose.shallow(initd, {});
-
-    self.rx.list = (observer, d) => {
-        observer.onCompleted();
-    };
-
-    self.rx.added = (observer, d) => {
-        observer.onCompleted();
-    };
+    const _initd = _.d.compose.shallow(
+        initd, {
+            channel: iotdb_transport.channel,
+            unchannel: iotdb_transport.unchannel,
+            encode: s => s.replace(/[\/$%#.\]\[]/g, (c) => '%' + c.charCodeAt(0).toString(16)),
+            decode: s => decodeURIComponent(s),
+            unpack: (doc, d) => JSON.parse(doc.toString ? doc.toString() : doc),
+            pack: d => JSON.stringify(d.value),
+        },
+        iotdb.keystore().get("/transports/iotdb-transport-opensensors/initd"), {
+            prefix: "/users/dpjanes/",
+        }
+    );
 
     self.rx.put = (observer, d) => {
-        observer.onCompleted();
+        _mqtt_client.ensure(error => {
+            if (_.is.Error(error)) {
+                return observer.onError(error);
+            }
+
+            const topic = _initd.channel(_initd, d);
+            const message = _initd.pack(_initd, d);
+
+            if (_initd.verbose) {
+                logger.info({
+                    topic: topic,
+                    message: message,
+                    message_type: typeof message,
+                }, "VERBOSE: sending message");
+            }
+
+            _mqtt_client.publish(topic, message, {
+                retain: _initd.retain,
+                qos: _initd.qos,
+            }, error => {
+                if (_.is.Error(error)) {
+                    return observer.onError(error);
+                }
+
+                observer.onNext(_.d.clone.shallow(d));
+                observer.onCompleted();
+            });
+        });
     };
     
-    self.rx.get = (observer, d) => {
-        observer.onCompleted();
-    };
-
-    self.rx.remove = (observer, d) => {
-        observer.onCompleted();
-    };
-    
-    self.rx.bands = (observer, d) => {
-        observer.onCompleted();
-    };
-
-    self.rx.updated = (observer, d) => {
-        observer.onCompleted();
-    };
+    self.rx.list = (observer, d) => { throw new errors.NeverImplemented(); };
+    self.rx.remove = (observer, d) => { throw new errors.NeverImplemented(); };
+    self.rx.added = (observer, d) => { throw new errors.NeverImplemented(); };
+    self.rx.get = (observer, d) => { throw new errors.NeverImplemented(); };
+    self.rx.bands = (observer, d) => { throw new errors.NeverImplemented(); };
+    self.rx.updated = (observer, d) => { throw new errors.NeverImplemented(); };
 
     return self;
 };

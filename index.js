@@ -25,4 +25,6 @@
 const transporter = require('./transporter');
 exports.make = transporter.make;
 
+const iotdb_transport_mqtt = require("iotdb-transport-mqtt");
+exports.connect = iotdb_transport_mqtt.connect;
 
