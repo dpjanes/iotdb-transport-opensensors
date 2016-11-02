@@ -1,4 +1,4 @@
-# iotdb-transport-prototype
+# iotdb-transport-opensensors
 [IOTDB](https://github.com/dpjanes/node-iotdb) 
 [Transporter](https://github.com/dpjanes/node-iotdb/blob/master/docs/transporters.md)
 for
