@@ -4,21 +4,23 @@
         "url": "https://github.com/dpjanes/iotdb-transport-opensensors/issues"
     }, 
     "dependencies": {
-        "iotdb-errors": "",
-        "iotdb": ">=0.11.0", 
-        "iotdb-transport": "~0.0.17"
+        "iotdb": ">=3.0.0", 
+        "iotdb-errors": "~3.0.2", 
+        "iotdb-format": "~0.0.5", 
+        "iotdb-transport": "~3.0.11", 
+        "iotdb-transport-mqtt": "~3.0.6"
     }, 
     "description": "IOTDB Transport for OpenSensors", 
     "devDependencies": {
-        "grunt": "~0.4.5", 
-        "grunt-contrib-jshint": "~0.11.3", 
-        "grunt-contrib-nodeunit": "~0.4.1", 
-        "grunt-contrib-uglify": "~0.11.0", 
-        "grunt-contrib-watch": "~0.6.1", 
-        "grunt-jsbeautifier": "~0.2.10", 
-        "jshint-stylish": "~2.1.0", 
-        "load-grunt-tasks": "~3.4.0", 
-        "request": "~2.67.0"
+        "grunt": "~1.0.1", 
+        "grunt-contrib-jshint": "~1.0.0", 
+        "grunt-contrib-nodeunit": "~1.0.0", 
+        "grunt-contrib-uglify": "~2.0.0", 
+        "grunt-contrib-watch": "~1.0.0", 
+        "grunt-jsbeautifier": "~0.2.13", 
+        "jshint-stylish": "~2.2.1", 
+        "load-grunt-tasks": "~3.5.2", 
+        "request": "~2.76.0"
     }, 
     "homepage": "https://homestar.io", 
     "homestar": {}, 
@@ -34,5 +36,5 @@
         "cover": "istanbul cover _mocha tests", 
         "test": "grunt"
     }, 
-    "version": "0.0.0"
+    "version": "3.0.0"
 }

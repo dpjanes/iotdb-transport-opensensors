@@ -60,9 +60,9 @@ const make = (initd, mqtt_client) => {
         }
     );
 
-    assert.ok(_initd.username, "initd.username is required");
-    assert.ok(_initd.password, "initd.password is required");
-    assert.ok(_initd.client_id, "initd.client_id is required");
+    assert.ok(_initd.username, "initd.username is required by OpenSensors.io");
+    assert.ok(_initd.password, "initd.password is required by OpenSensors.io");
+    assert.ok(_initd.client_id, "initd.client_id is required by OpenSensors.io");
 
     _initd.prefix = iotdb_format.format(_initd.prefix, _initd);
 
