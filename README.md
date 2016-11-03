@@ -11,3 +11,6 @@ for
 * [Read more about Transporters](https://github.com/dpjanes/node-iotdb/blob/master/docs/transporters.md)
 * [OpenSensors.io](https://www.opensensors.io/)
 
+# Use
+
+See the samples folder for working examples

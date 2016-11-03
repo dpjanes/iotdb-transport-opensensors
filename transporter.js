@@ -45,7 +45,7 @@ const make = (initd, mqtt_client) => {
 
     const _initd = _.d.compose.shallow(
         initd, {
-            channel: iotdb_transport.channel,
+            channel: null,
             unchannel: iotdb_transport.unchannel,
             encode: s => s.replace(/[\/$%#.\]\[]/g, (c) => '%' + c.charCodeAt(0).toString(16)),
             decode: s => decodeURIComponent(s),
@@ -57,12 +57,24 @@ const make = (initd, mqtt_client) => {
             username: null,
             password: null,
             client_id: null,
+            simple: true,
         }
     );
 
     assert.ok(_initd.username, "initd.username is required by OpenSensors.io");
     assert.ok(_initd.password, "initd.password is required by OpenSensors.io");
     assert.ok(_initd.client_id, "initd.client_id is required by OpenSensors.io");
+
+    if (_initd.simple) {
+        _initd.channel = _initd.channel || ((paramd, d) => {
+            d = _.d.clone.shallow(d);
+            delete d.band;
+
+            return iotdb_transport.channel(paramd, d);
+        });
+    } else {
+        _initd.channel = _initd.channel || iotdb_transport.channel;
+    }
 
     _initd.prefix = iotdb_format.format(_initd.prefix, _initd);
 
@@ -74,6 +86,24 @@ const make = (initd, mqtt_client) => {
 
             const topic = _initd.channel(_initd, d);
             const message = _initd.pack(d);
+
+            let ignore = false;
+            if (!message) {
+                ignore = true;
+            } else if (_initd.simple) {
+                if (d.band !== "istate") {
+                    ignore = true;
+                } else if (d.value["@timestamp"] === _.timestamp.epoch()) {
+                    ignore = true;
+                }
+            }
+
+            if (ignore) {
+                observer.onNext(_.d.clone.shallow(d));
+                observer.onCompleted();
+
+                return;
+            }
 
             if (_initd.verbose) {
                 logger.info({
